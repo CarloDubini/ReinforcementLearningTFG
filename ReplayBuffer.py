@@ -29,7 +29,8 @@ class ReplayBuffer:
         self.mem_cntr += 1
 
     def sample_buffer(self, batch_size):
-        """Devuelve una muestra de las almacenadas en forma de tupla (states, actions, rewards, states_, dones)"""
+        """Devuelve una muestra de las almacenadas en forma de 
+        tupla (states, actions, rewards, states_, dones)"""
         max_mem = min(self.mem_cntr, self.mem_size)
         batch = np.random.choice(max_mem, batch_size, replace=False)
 
