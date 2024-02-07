@@ -1,8 +1,8 @@
 import gym
 import numpy as np
-import utils  # Se asume que existe un módulo 'utils' que contiene funciones de utilidad
+import utils  
 
-if __name__ == '__main__':
+def main():
     # Creación del entorno
     env = gym.make('Pendulum-v1')
     n_actions = env.action_space.shape[0]
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     else:
         evaluate = False
 
-    # Ciclo principal de juego
+    # Ciclo principal
     for i in range(n_games):
         observation = env.reset()  # Reiniciar el entorno para un nuevo episodio
         done = False
@@ -54,8 +54,8 @@ if __name__ == '__main__':
         if avg_score > best_score:
             best_score = avg_score
             # Guardar los modelos del agente si no se cargó un punto de control previo
-            #if not load_checkpoint:
-                # agent.save_models()
+            if not load_checkpoint:
+                 agent.save_models()
 
         # Imprimir información sobre el episodio actual
         print('episodio', i, 'puntuación %.1f' % score, 'puntuación media %.1f' % avg_score)
