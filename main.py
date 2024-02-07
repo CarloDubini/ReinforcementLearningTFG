@@ -1,6 +1,7 @@
 import gym
 import numpy as np
-import utils  
+import utils
+from Actor import Agent
 
 def main():
     # Creación del entorno
@@ -64,3 +65,6 @@ def main():
     if not load_checkpoint:
         x = [i + 1 for i in range(n_games)]
         utils.plot_learning_curve(x, score_history, figure_file)
+
+if __name__ == "__main__":
+    main()

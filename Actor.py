@@ -3,6 +3,10 @@ from keras.api._v2.keras.optimizers import Adam
 from keras.api._v2.keras.layers import Dense
 import numpy as np
 
+from ReplayBuffer import ReplayBuffer
+from ActorNetwork import ActorNetwork
+from CriticNetwork import CriticNetwork
+
 class Agent:
     """El agente DDPG, que incluye una red crítica y una red de actor, generalizado para su uso en cualquier entorno sabiendo los parámetros de entrada (Sensores en REAS) y número de acciones a tomar"""
     def __init__(self, input_dims, alpha=0.001, beta=0.002, env=None, gamma=0.99, n_actions=2, max_size=1000000, tau=0.005, fc1=400, fc2=300, batch_size=64, noise=0.1):
