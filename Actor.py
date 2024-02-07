@@ -2,6 +2,7 @@ import tensorflow as tf
 from keras.api._v2.keras.optimizers import Adam
 from keras.api._v2.keras.layers import Dense
 import numpy as np
+import keras.api._v2.keras as keras
 
 from ReplayBuffer import ReplayBuffer
 from ActorNetwork import ActorNetwork
@@ -79,4 +80,44 @@ class Agent:
         actions = tf.clip_by_value(actions, self.min_action, self.max_action)
 
         return actions[0]
+    
+    def learn(self):
+        if self.memory.mem_cntr < self.batch_size:
+            return
+        
+        state, action, reward, new_state, done = \
+            self.memory.sample_buffer(self.batch_size)
+        
+        states = tf.convert_to_tensor(state, dtype=tf.float32)
+        states_ = tf.convert_to_tensor(new_state, dtype=tf.float32)
+        actions = tf.convert_to_tensor(action, dtype=tf.float32)
+        rewards = tf.convert_to_tensor(reward, dtype=tf.float32)
+
+        with tf.GradientTape as tape:
+            target_actions = self.target_actor(states_)
+            critic_value_ = tf.squeeze(self.target_critic(states_, target_actions, 1))
+            critic_value = tf.squeeze(self.critic(states, actions), 1)
+            target = reward + self.gamma*critic_value_*(1-done)
+            critic_loss = keras.losses.MSE(target, critic_value)
+        
+        critic_network_gradient = tape.gradient(critic_loss, self.critic_trainable_variables)
+
+        self.critic.optimizer.apply_gradients(zip(critic_network_gradient, self.critic_trainable_variables))
+        
+        with tf.GradientTape() as tape:
+            new_policy_actions = self.actor(states)
+            actor_loss = -self.critic(states, new_policy_actions)
+            actor_loss = tf.math.reduce_mean(actor_loss)
+
+        actor_network_gradient = tape.gradient(actor_loss, self.actor_trainable_variables)
+
+        self.actor.optimizer.apply_gradients(zip(actor_network_gradient, self.actor_trainable_variables))
+
+        self.update_network_parameters()
+
+        
+
+        
+
+
 
