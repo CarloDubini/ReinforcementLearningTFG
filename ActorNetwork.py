@@ -1,3 +1,8 @@
+import os
+import tensorflow as tf
+from keras.api._v2.keras.layers import Dense
+import keras.api._v2.keras as keras
+
 class ActorNetwork(keras.Model):
         def __init__(self, fc1_dims=512, fc2_dims=512, n_actions = 2, name='actor', chkpt_dir='tmp/ddpg'):
              #Inicializo la red, sus dimensiones y posibles acciones
