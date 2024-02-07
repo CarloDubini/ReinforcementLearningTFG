@@ -1,5 +1,5 @@
 
-
+import os
 import tensorflow as tf
 from keras.api._v2.keras.layers import Dense
 import keras.api._v2.keras as keras
@@ -10,7 +10,6 @@ class CriticNetwork(keras.Model):
         super(CriticNetwork, self).__init__()
         self.fc1_dims = fc1_dims
         self.fc2_dims = fc2_dims
-        self.n_actions = n_actions
 
         self.model_name = name
         self.checkpoint_dir = chkpt_dir

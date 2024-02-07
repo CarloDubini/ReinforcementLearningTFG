@@ -71,6 +71,7 @@ class Agent:
     def choose_action(self, observation, evaluate=False):
         """Utiliza la red neuronal del actor para predecir acciones, opcionalmente añade ruido para la exploración y
         garantiza que las acciones generadas estén dentro de los límites permitidos por el entorno."""
+        observation = np.array(observation)  # Convertir observation a una matriz numpy
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
         actions = self.actor(state)
         if not evaluate:
@@ -78,3 +79,4 @@ class Agent:
         actions = tf.clip_by_value(actions, self.min_action, self.max_action)
 
         return actions[0]
+
