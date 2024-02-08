@@ -73,7 +73,10 @@ class Agent:
         """Utiliza la red neuronal del actor para predecir acciones, opcionalmente añade ruido para la exploración y
         garantiza que las acciones generadas estén dentro de los límites permitidos por el entorno."""
         observation = np.array(observation)  # Convertir observation a una matriz numpy
-        state = tf.convert_to_tensor([observation], dtype=tf.float32)
+        print(observation)
+        state = tf.convert_to_tensor([observation], dtype=np.float32)
+        print("Tensor")
+        print(state)
         actions = self.actor(state)
         if not evaluate:
             actions += tf.random.normal(shape=[self.n_actions], mean=0.0, stddev=self.noise)

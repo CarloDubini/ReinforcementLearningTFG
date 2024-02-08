@@ -36,17 +36,17 @@ def main():
 
     # Ciclo principal
     for i in range(n_games):
-        observation = env.reset()  # Reiniciar el entorno para un nuevo episodio
+        observation = env.reset()[0]  # Reiniciar el entorno para un nuevo episodio
         done = False
         score = 0
         while not done:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
-            observation_, reward, done, info = env.step(action)  # Realizar la acción en el entorno
+            observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             score += reward  # Actualizar la puntuación acumulada
-            agent.remember(observation, action, reward, observation_, done)  # Almacenar la transición
+            agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
-            observation = observation_  # Actualizar el estado actual
+            observation = observation_[0]  # Actualizar el estado actual
 
         score_history.append(score)  # Almacenar la puntuación del episodio
         avg_score = np.mean(score_history[-100:])  # Calcular la puntuación media en los últimos 100 episodios
