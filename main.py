@@ -46,7 +46,7 @@ def main():
             agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
-            observation = observation_[0]  # Actualizar el estado actual
+            observation = observation_  # Actualizar el estado actual
 
         score_history.append(score)  # Almacenar la puntuación del episodio
         avg_score = np.mean(score_history[-100:])  # Calcular la puntuación media en los últimos 100 episodios

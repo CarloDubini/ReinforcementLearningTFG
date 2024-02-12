@@ -73,10 +73,7 @@ class Agent:
         """Utiliza la red neuronal del actor para predecir acciones, opcionalmente añade ruido para la exploración y
         garantiza que las acciones generadas estén dentro de los límites permitidos por el entorno."""
         observation = np.array(observation)  # Convertir observation a una matriz numpy
-        print(observation)
         state = tf.convert_to_tensor([observation], dtype=np.float32)
-        print("Tensor")
-        print(state)
         actions = self.actor(state)
         if not evaluate:
             actions += tf.random.normal(shape=[self.n_actions], mean=0.0, stddev=self.noise)
@@ -95,26 +92,26 @@ class Agent:
         states_ = tf.convert_to_tensor(new_state, dtype=tf.float32)
         actions = tf.convert_to_tensor(action, dtype=tf.float32)
         rewards = tf.convert_to_tensor(reward, dtype=tf.float32)
-
-        with tf.GradientTape as tape:
+        
+        with tf.GradientTape() as tape:
             target_actions = self.target_actor(states_)
-            critic_value_ = tf.squeeze(self.target_critic(states_, target_actions, 1))
+            critic_value_ = tf.squeeze(self.target_critic(states_, target_actions),1)
             critic_value = tf.squeeze(self.critic(states, actions), 1)
             target = reward + self.gamma*critic_value_*(1-done)
             critic_loss = keras.losses.MSE(target, critic_value)
         
-        critic_network_gradient = tape.gradient(critic_loss, self.critic_trainable_variables)
+            critic_network_gradient = tape.gradient(critic_loss, self.critic.trainable_variables)
 
-        self.critic.optimizer.apply_gradients(zip(critic_network_gradient, self.critic_trainable_variables))
+        self.critic.optimizer.apply_gradients(zip(critic_network_gradient, self.critic.trainable_variables))
         
         with tf.GradientTape() as tape:
             new_policy_actions = self.actor(states)
             actor_loss = -self.critic(states, new_policy_actions)
             actor_loss = tf.math.reduce_mean(actor_loss)
 
-        actor_network_gradient = tape.gradient(actor_loss, self.actor_trainable_variables)
+            actor_network_gradient = tape.gradient(actor_loss, self.actor.trainable_variables)
 
-        self.actor.optimizer.apply_gradients(zip(actor_network_gradient, self.actor_trainable_variables))
+        self.actor.optimizer.apply_gradients(zip(actor_network_gradient, self.actor.trainable_variables))
 
         self.update_network_parameters()
 
