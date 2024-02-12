@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-import utils
+from utils import plot_learning_curve
 from Actor import Agent
 
 def main():
@@ -10,7 +10,7 @@ def main():
 
     # Creación del agente con el entorno y el número de acciones adecuados
     agent = Agent(input_dims=env.observation_space.shape, env=env, n_actions=n_actions)
-    n_games = 250  # Número de episodios a jugar
+    n_games = 20  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file = 'plots/pendulum.png'
@@ -40,12 +40,10 @@ def main():
         done = False
         score = 0
         j = 0
-        while not done and j < 200:
+        while not done and j < 500:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             score += reward  # Actualizar la puntuación acumulada
-            print(observation)
-            print(j)
             agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
@@ -68,7 +66,7 @@ def main():
     # Graficar la curva de aprendizaje si no se cargó un punto de control previo
     if not load_checkpoint:
         x = [i + 1 for i in range(n_games)]
-        utils.plot_learning_curve(x, score_history, figure_file)
+        plot_learning_curve(x, score_history, figure_file)
 
 if __name__ == "__main__":
     main()
