@@ -12,6 +12,7 @@ def main():
     # Creación del agente con el entorno y el número de acciones adecuados
     agent = Agent(input_dims=env.observation_space.shape, env=env, n_actions=n_actions)
     n_games = 20  # Número de episodios a jugar
+    max_steps= 1000
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file = 'plots/pendulum.png'
@@ -42,7 +43,7 @@ def main():
         done = False
         score = 0
         j = 0
-        while not done and j < 500:
+        while not done and j < max_steps:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             score += reward  # Actualizar la puntuación acumulada
