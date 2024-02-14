@@ -1,11 +1,12 @@
 import gym
 import numpy as np
+import matplotlib
 from utils import plot_learning_curve
 from Actor import Agent
 
 def main():
     # Creación del entorno
-    env = gym.make('Pendulum-v1')
+    env = gym.make('Pendulum-v1',render_mode='human')
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
@@ -23,6 +24,7 @@ def main():
     if load_checkpoint:
         n_steps = 0
         while n_steps <= agent.batch_size:
+            env.render()
             observation = env.reset()
             action = env.action_space.sample()
             observation_, reward, done, info = env.step(action)
