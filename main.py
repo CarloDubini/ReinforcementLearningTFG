@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 import numpy as np
 import matplotlib
 from utils import plot_learning_curve
@@ -6,8 +6,9 @@ from Actor import Agent
 
 def main():
     # Creación del entorno
-    env = gym.make('Pendulum-v1',render_mode='human')
+    env = gym.make('FetchReach-v2', max_episode_steps=100,render_mode="human")
     n_actions = env.action_space.shape[0]
+    print(env.observation_space)
 
     # Creación del agente con el entorno y el número de acciones adecuados
     agent = Agent(input_dims=env.observation_space.shape, env=env, n_actions=n_actions)
@@ -42,8 +43,7 @@ def main():
         observation = env.reset()[0]  # Reiniciar el entorno para un nuevo episodio
         done = False
         score = 0
-        j = 0
-        while not done and j < max_steps:
+        while not done:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             score += reward  # Actualizar la puntuación acumulada
@@ -51,7 +51,6 @@ def main():
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
             observation = observation_  # Actualizar el estado actual
-            j += 1
 
         score_history.append(score)  # Almacenar la puntuación del episodio
         avg_score = np.mean(score_history[-100:])  # Calcular la puntuación media en los últimos 100 episodios
@@ -66,10 +65,13 @@ def main():
         # Imprimir información sobre el episodio actual
         print('episodio', i, 'puntuación %.1f' % score, 'puntuación media %.1f' % avg_score)
 
+
     # Graficar la curva de aprendizaje si no se cargó un punto de control previo
     if not load_checkpoint:
         x = [i + 1 for i in range(n_games)]
         plot_learning_curve(x, score_history, figure_file)
-
+    
+    env.close()
+    
 if __name__ == "__main__":
     main()
