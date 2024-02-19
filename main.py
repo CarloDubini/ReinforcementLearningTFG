@@ -8,10 +8,16 @@ def main():
     # Creación del entorno
     env = gym.make('FetchReach-v2', max_episode_steps=100,render_mode="human")
     n_actions = env.action_space.shape[0]
-    print(env.observation_space)
 
     # Creación del agente con el entorno y el número de acciones adecuados
-    agent = Agent(input_dims=env.observation_space.shape, env=env, n_actions=n_actions)
+
+    result = env.observation_space.items()
+    # Convert object to a list
+    data = list(result)
+ 
+    # Convert list to an array
+    numpyArray = np.array(data)
+    agent = Agent(input_dims=numpyArray.shape, env=env, n_actions=n_actions)
     n_games = 15  # Número de episodios a jugar
     max_steps= 2000
 
@@ -41,6 +47,9 @@ def main():
     # Ciclo principal
     for i in range(n_games):
         observation = env.reset()[0]  # Reiniciar el entorno para un nuevo episodio
+        result = observation.items()
+        data = list(result)
+        observation = np.array(data)
         done = False
         score = 0
         while not done:
