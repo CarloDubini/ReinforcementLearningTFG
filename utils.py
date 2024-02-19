@@ -8,3 +8,8 @@ def plot_learning_curve(x, scores, figure_file):
     plt.plot(x, running_avg)
     plt.title('Running average of previous 100 scores')
     plt.savefig(figure_file)
+
+
+def transformObservation(obs):
+    observation = np.concatenate((obs['observation'],obs['desired_goal']),axis=None)
+    return observation
