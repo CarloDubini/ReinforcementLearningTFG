@@ -1,6 +1,5 @@
 import gymnasium as gym
 import numpy as np
-import matplotlib
 from utils import plot_learning_curve,transformObservation
 from Actor import Agent
 
