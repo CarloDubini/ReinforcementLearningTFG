@@ -12,8 +12,8 @@ def main():
     numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample()),axis=None)
  
     # Convert list to an array
-    agent = Agent(input_dims=numpyArray.shape, env=env, n_actions=n_actions)
-    n_games = 15  # Número de episodios a jugar
+    agent = Agent(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
+    n_games = 30  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file = 'pendulum.png'
@@ -40,11 +40,11 @@ def main():
 
     # Ciclo principal
     for i in range(n_games):
-        observation = transformObservation(env.reset()[0])  # Reiniciar el entorno para un nuevo episodio
-        
+        observation = transformObservation(env.reset()[0])  # transformar el observation de un diccionario a un array        
         done = False
         score = 0
-        while not done:
+        j=0
+        while not done and j<100:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             observation_= transformObservation(observation_)
@@ -53,6 +53,7 @@ def main():
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
             observation = observation_  # Actualizar el estado actual
+            j+=1
 
         score_history.append(score)  # Almacenar la puntuación del episodio
         avg_score = np.mean(score_history[-100:])  # Calcular la puntuación media en los últimos 100 episodios
