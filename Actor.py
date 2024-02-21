@@ -27,14 +27,16 @@ class Actor:
             self.max_action = env.action_space.high[0]
             self.min_action = env.action_space.low[0]
 
-        self.actor_net = ActorNetwork(n_actions=n_actions, name='actor')
-        self.target_actor_net = ActorNetwork(n_actions=n_actions, name='target_actor')
+        fc_dims= float(round((input_dims[0]+n_actions)*0.6)) # numero de neuronas escondidas en cada capa
+
+        self.actor_net = ActorNetwork(n_actions=n_actions, name='actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
+        self.target_actor_net = ActorNetwork(n_actions=n_actions, name='target_actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
 
         self.actor_net.compile( optimizer=Adam(learning_rate=alpha))
         self.target_actor_net.compile( optimizer=Adam(learning_rate=alpha))
 
-        self.critic_net = CriticNetwork(name='critic')
-        self.target_critic_net = CriticNetwork(name='target_critic')
+        self.critic_net = CriticNetwork(name='critic',fc1_dims=input_dims[0],fc2_dims=input_dims[0])
+        self.target_critic_net = CriticNetwork(name='target_critic',fc1_dims=input_dims[0],fc2_dims=input_dims[0])
         
         self.critic_net.compile( optimizer=Adam(learning_rate=beta))
         self.target_critic_net.compile( optimizer=Adam(learning_rate=beta))
