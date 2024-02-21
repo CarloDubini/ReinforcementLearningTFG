@@ -8,4 +8,6 @@ env = gym.make('FetchReach-v2', max_episode_steps=100,render_mode="human")
 
 observation = env.reset()
 
-print(env.action_space.shape[0])
+numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample()),axis=None)
+
+print(numpyArray.shape[0])

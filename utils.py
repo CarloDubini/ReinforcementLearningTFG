@@ -11,5 +11,5 @@ def plot_learning_curve(x, scores, figure_file):
 
 
 def transformObservation(obs):
-    observation = np.concatenate((obs['observation'],obs['desired_goal']),axis=None)
+    observation = np.concatenate((obs['observation'],obs['desired_goal'],obs['achieved_goal']),axis=None)
     return observation

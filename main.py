@@ -5,15 +5,15 @@ from Actor import Agent
 
 def main():
     # Creación del entorno
-    env = gym.make('FetchReachDense-v2', max_episode_steps=100,render_mode="human")
+    env = gym.make('FetchReachDense-v2',render_mode="human")
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
-    numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample()),axis=None)
+    numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample(),env.observation_space['achieved_goal'].sample()),axis=None)
  
     # Convert list to an array
     agent = Agent(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
-    n_games = 30  # Número de episodios a jugar
+    n_games = 100  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file = 'pendulum.png'
@@ -40,7 +40,8 @@ def main():
 
     # Ciclo principal
     for i in range(n_games):
-        observation = transformObservation(env.reset()[0])  # transformar el observation de un diccionario a un array        
+        observation = transformObservation(env.reset()[0])  # transformar el observation de un diccionario a un array 
+            
         done = False
         score = 0
         j=0
