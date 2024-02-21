@@ -12,7 +12,7 @@ def main():
     numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample(),env.observation_space['achieved_goal'].sample()),axis=None)
  
     # Convert list to an array
-    agent = Agent(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
+    agent = Actor(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
     n_games = 100  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
