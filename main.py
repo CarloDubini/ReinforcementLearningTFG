@@ -1,7 +1,7 @@
 import gymnasium as gym
 import numpy as np
 from utils import plot_learning_curve,transformObservation
-from Actor import Agent
+from Actor import Actor
 
 def main():
     # Creación del entorno
