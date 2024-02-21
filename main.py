@@ -1,7 +1,7 @@
 import gymnasium as gym
 import numpy as np
 from utils import plot_learning_curve,transformObservation
-from Actor import Agent
+from Actor import Actor
 
 def main():
     # Creación del entorno
@@ -12,7 +12,7 @@ def main():
     numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample()),axis=None)
  
     # Convert list to an array
-    agent = Agent(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
+    agent = Actor(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
     n_games = 30  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
