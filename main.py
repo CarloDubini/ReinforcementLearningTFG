@@ -1,3 +1,4 @@
+import time
 import gymnasium as gym
 import numpy as np
 from utils import plot_learning_curve,transformObservation
@@ -12,7 +13,7 @@ def main():
     numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample(),env.observation_space['achieved_goal'].sample()),axis=None)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, env=env, n_actions=n_actions,alpha=0.002,beta=0.004)
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions,alpha=0.002,beta=0.004)
     n_games = 100  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
@@ -25,11 +26,14 @@ def main():
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint:
         n_steps = 0
-        while n_steps <= agent.batch_size:
+        while n_steps <= agent.batch_len:
             env.render()
             observation = env.reset()
             action = env.action_space.sample()
-            observation_, reward, done, info = env.step(action)
+            observation = np.concatenate((env.observation_space['observation'].sample(),
+                                          env.observation_space['desired_goal'].sample(),
+                                          env.observation_space['achieved_goal'].sample()),axis=None)
+            observation_, reward, done, info, _ = env.step(action)
             agent.remember(observation, action, reward, observation_, done)
             n_steps += 1
         agent.learn()
@@ -49,11 +53,13 @@ def main():
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             observation_= transformObservation(observation_)
+            
             score += reward  # Actualizar la puntuación acumulada
             agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
             observation = observation_  # Actualizar el estado actual
+            
             j+=1
 
         score_history.append(score)  # Almacenar la puntuación del episodio

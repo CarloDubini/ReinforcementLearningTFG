@@ -2,7 +2,7 @@ import gym
 import numpy as np
 import matplotlib
 from utils import plot_learning_curve
-from Actor import Agent
+from Actor import Actor
 
 def main():
     # Creación del entorno
@@ -10,26 +10,28 @@ def main():
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
-    agent = Agent(input_dims=env.observation_space.shape, env=env, n_actions=n_actions)
-    n_games = 15  # Número de episodios a jugar
-    max_steps= 2000
+    agent = Actor(input_dims=env.observation_space.shape, environment=env, n_actions=n_actions)
+    n_games = 20  # Número de episodios a jugar
+    max_steps= 1000
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file = 'pendulum.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    load_checkpoint = False  # Bandera para cargar un punto de control previo
+    load_checkpoint = True  # Bandera para cargar un punto de control previo
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint:
         n_steps = 0
-        while n_steps <= agent.batch_size:
-            env.render()
-            observation = env.reset()
+        while n_steps <= agent.batch_len:
+            observation = env.reset()[0]
             action = env.action_space.sample()
-            observation_, reward, done, info = env.step(action)
-            agent.remember(observation, action, reward, observation_, done)
+            print(observation)
+            print(action)
+            a = env.step(action)
+            observation_, reward, done, info, _ = env.step(action)
+            agent.remember(observation, action, reward, observation_[0], done)
             n_steps += 1
         agent.learn()
         agent.load_models()
