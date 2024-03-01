@@ -9,7 +9,7 @@ class ActorNetwork(keras.Model):
              super(ActorNetwork, self).__init__()
              self.fc1_dims = fc1_dims
              self.fc2_dims = fc2_dims
-             self.n_actions = n_actions
+             self.n_actions = n_actions-1 #esto es para eliminar el griper de la red neuronal
 
              self.model_name = name
              self.checkpoint_dir = chkpt_dir
@@ -26,6 +26,10 @@ class ActorNetwork(keras.Model):
 
              #Se puede multiplicar si el objetivo no es del rango de 1 a -1
              mu = self.mu(prob)
+             #esto se debe a que aunque no se necesite, el entorno te exige entregar el resultado del griper, cosa que es malo para el funcionamiento de la NN.
 
+             nc = tf.shape(mu)[0]
+             nc = tf.fill((nc, 1), 0.1)
+             mu = tf.concat([mu, nc], axis=1)
 
              return mu

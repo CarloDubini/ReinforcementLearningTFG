@@ -28,23 +28,26 @@ class Actor:
         self.tau = tau
         self.batch_len = batch_size
         self.n_actions = n_actions
+        self.alpha = alpha
+        self.beta= beta
 
         #fc_dims= float(round((input_dims[0]+n_actions)*0.6)) # numero de neuronas escondidas en cada capa
-        fc_dims= 600
+        fc_dims= 50
         
-        self.actor_net = ActorNetwork(n_actions=n_actions, name='actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
-        self.target_actor_net = ActorNetwork(n_actions=n_actions, name='target_actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
+        self.actor_net = ActorNetwork(n_actions=self.n_actions, name='actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
+        self.target_actor_net = ActorNetwork(n_actions=self.n_actions, name='target_actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
 
-        self.actor_net.compile( optimizer=Adam(learning_rate=alpha))
-        self.target_actor_net.compile( optimizer=Adam(learning_rate=alpha))
+        self.actor_net.compile( optimizer=Adam(learning_rate=self.alpha))
+        self.target_actor_net.compile( optimizer=Adam(learning_rate=self.alpha))
 
         self.critic_net = CriticNetwork(name='critic',fc1_dims=fc_dims,fc2_dims=fc_dims)
         self.target_critic_net = CriticNetwork(name='target_critic',fc1_dims=fc_dims,fc2_dims=fc_dims)
         
-        self.critic_net.compile( optimizer=Adam(learning_rate=beta))
-        self.target_critic_net.compile( optimizer=Adam(learning_rate=beta))
+        self.critic_net.compile( optimizer=Adam(learning_rate=self.beta))
+        self.target_critic_net.compile( optimizer=Adam(learning_rate=self.beta))
 
         self.update_network_parameters(tau=1)
+
 
     def update_network_parameters(self, tau=None):
         """Actualiza los valores de peso según tau, controlando esta a qué velocidad se actualizan"""
@@ -111,6 +114,7 @@ class Actor:
         states_ = tf.convert_to_tensor(new_state, dtype=tf.float32)
         actions = tf.convert_to_tensor(action, dtype=tf.float32)
         rewards = tf.convert_to_tensor(reward, dtype=tf.float32)
+        
         
         with tf.GradientTape() as tape:
             target_actions = self.target_actor_net(states_)

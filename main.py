@@ -10,11 +10,12 @@ def main():
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
-    numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample()),axis=None)
+    obs_array=env.observation_space['observation'].sample()
+    numpyArray= np.concatenate((obs_array[0:3],env.observation_space['desired_goal'].sample()),axis=None)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions)
-    n_games = 200  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions) 
+    n_games = 1000  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file = 'FetchReachPlot.png'
