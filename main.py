@@ -10,14 +10,14 @@ def main():
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
-    numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample(),env.observation_space['achieved_goal'].sample()),axis=None)
+    numpyArray= np.concatenate((env.observation_space['observation'].sample(),env.observation_space['desired_goal'].sample()),axis=None)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions,alpha=0.002,beta=0.004)
-    n_games = 100  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions)
+    n_games = 200  # Número de episodios a jugar
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file = 'pendulum.png'
+    figure_file = 'FetchReachPlot.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
@@ -31,8 +31,7 @@ def main():
             observation = env.reset()
             action = env.action_space.sample()
             observation = np.concatenate((env.observation_space['observation'].sample(),
-                                          env.observation_space['desired_goal'].sample(),
-                                          env.observation_space['achieved_goal'].sample()),axis=None)
+                                          env.observation_space['desired_goal'].sample()),axis=None)
             observation_, reward, done, info, _ = env.step(action)
             agent.remember(observation, action, reward, observation_, done)
             n_steps += 1
@@ -49,7 +48,7 @@ def main():
         done = False
         score = 0
         j=0
-        while not done and j<100:
+        while not done and j<50:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             observation_= transformObservation(observation_)
@@ -63,7 +62,7 @@ def main():
             j+=1
 
         score_history.append(score)  # Almacenar la puntuación del episodio
-        avg_score = np.mean(score_history[-100:])  # Calcular la puntuación media en los últimos 100 episodios
+        avg_score = np.mean(score_history[-200:])  # Calcular la puntuación media en los últimos 100 episodios
 
         # Actualizar la mejor puntuación si se supera
         if avg_score > best_score:

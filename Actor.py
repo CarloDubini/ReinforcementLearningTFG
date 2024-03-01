@@ -30,7 +30,7 @@ class Actor:
         self.n_actions = n_actions
 
         #fc_dims= float(round((input_dims[0]+n_actions)*0.6)) # numero de neuronas escondidas en cada capa
-        fc_dims= 500
+        fc_dims= 600
         
         self.actor_net = ActorNetwork(n_actions=n_actions, name='actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
         self.target_actor_net = ActorNetwork(n_actions=n_actions, name='target_actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
@@ -48,6 +48,7 @@ class Actor:
 
     def update_network_parameters(self, tau=None):
         """Actualiza los valores de peso según tau, controlando esta a qué velocidad se actualizan"""
+        # TODO Revisar
         if tau is None:
             tau = self.tau
         
