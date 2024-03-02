@@ -42,8 +42,11 @@ def main():
     else:
         evaluate = False
 
+   
+    
     # Ciclo principal
     for i in range(n_games):
+
         observation = transformObservation(env.reset()[0])  # transformar el observation de un diccionario a un array 
             
         done = False

@@ -10,7 +10,7 @@ from CriticNetwork import CriticNetwork
 
 class Actor:
     """El Actor DDPG, que incluye una red crítica y una red de actor, generalizado para su uso en cualquier entorno sabiendo los parámetros de entrada (Sensores en REAS) y número de acciones a tomar"""
-    def __init__(self, input_dims, alpha=0.001, beta=0.002, environment=None, gamma=0.99, n_actions=2, max_size=1000000, tau=0.005, fc1=400, fc2=300, batch_size=64, noise=0.1):
+    def __init__(self, input_dims, alpha=0.001, beta=0.002, environment=None, gamma=0.99, n_actions=2, max_size=1000000, tau=0.005, fc1=400, fc2=300, batch_size=64, noise=0.01):
         """Utiliza alpha y beta para los porcentajes de aprendizaje de las redes, y gamma para cambiar el objetivo de la red crítica, así como tau se utiliza para controlar la tasa a la que se actualizan los pesos de la red objetivo.
         Los fc's sirven para el número de neuronas de las redes. n_actions es la cantidad de acciones finales a elegir."""
         
