@@ -1,7 +1,7 @@
 import time
 import gymnasium as gym
 import numpy as np
-from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation
+from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared
 from Actor import Actor
 
 def main():
@@ -14,8 +14,8 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 200, alpha= 0.00001, beta= 0.00002, noise= 0.03,tau=0.01) 
-    n_games = 1000  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 250, alpha= 0.000001, beta= 0.000002, batch_size= 100, gamma= 0.99, noise= 0.01) 
+    n_games = 3000  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
@@ -63,8 +63,11 @@ def main():
                 goal = observation_["desired_goal"]
                 goal_set = True
             observation_= transformObservation(observation_)
-
-            reward = euclidDistanceNegative(observation, goal)
+            
+            reward = euclidDistanceNegative(observation_, goal)
+            if j < 48 and j > 42:
+                print(reward)
+                
             if(reward>-0.2):
                 reward= reward*0.5
             
@@ -72,7 +75,7 @@ def main():
                 print(reward)
 
             score += reward  # Actualizar la puntuación acumulada
-            agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
+            agent.remember(observation, action, reward, observation_, done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
             observation = observation_  # Actualizar el estado actual

@@ -9,3 +9,4 @@ model_weights/actor_ddpg.h5
 model_weights/critic_ddpg.h5
 model_weights/target_actor_ddpg.h5
 model_weights/target_critic_ddpg.h5
+model_weights/actor_ddpg.h5

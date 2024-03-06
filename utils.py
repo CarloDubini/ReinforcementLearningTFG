@@ -1,5 +1,6 @@
 from scipy.spatial import distance
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 def plot_learning_curve(x, scores, figure_file, number=100):
     running_avg = np.zeros(len(scores))
@@ -30,4 +31,10 @@ def transformObservation(obs):
 def euclidDistanceNegative(observation, goal):
     a = (observation[0], observation[1], observation[2])
     b = (goal[0], goal[1], goal[2])
-    return -distance.euclidean(a, b) 
+    return -distance.euclidean(a, b)
+
+def euclidDistanceNegativeTimesSquared(observation, goal):
+    a = (observation[0], observation[1], observation[2])
+    b = (goal[0], goal[1], goal[2])
+    reward = math.pow(100 * distance.euclidean(a, b),2)
+    return -reward
