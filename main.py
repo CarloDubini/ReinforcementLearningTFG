@@ -1,7 +1,7 @@
 import time
 import gymnasium as gym
 import numpy as np
-from utils import euclidDistanceNegative, plot_learning_curve,transformObservation
+from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation
 from Actor import Actor
 
 def main():
@@ -14,12 +14,15 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, alpha= 0.00001, beta= 0.00002, noise= 0.01) 
-    n_games = 500  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 100, alpha= 0.00001, beta= 0.00002, noise= 0.03) 
+    n_games = 3000  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file = 'FetchReachPlot.png'
+    figure_file = 'FetchReachPlot1.png'
+    figure_file2 = 'FetchReachPlot2.png'
+    figure_file3 = 'FetchReachPlot3.png'
+    figure_file4 = 'FetchReachPlot4.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
@@ -62,7 +65,7 @@ def main():
 
             reward = euclidDistanceNegative(observation, goal)
             
-            if j < 25 and j > 22: 
+            if j < 25 and j > 23: 
                 print(reward)
 
             score += reward  # Actualizar la puntuación acumulada
@@ -91,7 +94,9 @@ def main():
     if not load_checkpoint:
         x = [i + 1 for i in range(n_games)]
         plot_learning_curve(x, score_history, figure_file)
-        plot_learning_curve(x, score_history, figure_file , n_games)
+        plot_learning_curve(x, score_history, figure_file2 , n_games)
+        plot_learning_curve(x, score_history, figure_file3 , 3)
+        plot_learning_curve_three(x, score_history, figure_file4, n_games)
     
     env.close()
     
