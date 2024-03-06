@@ -114,7 +114,6 @@ class Actor:
         actions = tf.convert_to_tensor(action, dtype=tf.float32)
         rewards = tf.convert_to_tensor(reward, dtype=tf.float32)
         
-        
         with tf.GradientTape() as tape:
             target_actions = self.target_actor_net(states_)
             critic_value_ = tf.squeeze(self.target_critic_net(states_, target_actions),1)

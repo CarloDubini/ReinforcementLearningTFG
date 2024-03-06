@@ -14,8 +14,8 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 100, alpha= 0.00001, beta= 0.00002, noise= 0.03) 
-    n_games = 3000  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 100, alpha= 0.00001, beta= 0.00002, noise= 0.03,tau=0.01) 
+    n_games = 1000  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
@@ -64,6 +64,8 @@ def main():
             observation_= transformObservation(observation_)
 
             reward = euclidDistanceNegative(observation, goal)
+            if(reward>-0.2):
+                reward= reward*0.5
             
             if j < 25 and j > 23: 
                 print(reward)
