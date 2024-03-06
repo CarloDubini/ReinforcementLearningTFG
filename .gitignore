@@ -4,3 +4,8 @@ __pycache__/ActorNetwork.cpython-310.pyc
 __pycache__/CriticNetwork.cpython-310.pyc
 __pycache__/ReplayBuffer.cpython-310.pyc
 *.h5
+*.h5
+model_weights/actor_ddpg.h5
+model_weights/critic_ddpg.h5
+model_weights/target_actor_ddpg.h5
+model_weights/target_critic_ddpg.h5

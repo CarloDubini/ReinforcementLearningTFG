@@ -6,7 +6,7 @@ from Actor import Actor
 
 def main():
     # Creación del entorno
-    env = gym.make('FetchReachDense-v2',render_mode="human")
+    env = gym.make('FetchReachDense-v2',render_mode="human", max_episode_steps=50)
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
@@ -14,15 +14,15 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 100, alpha= 0.00001, beta= 0.00002, noise= 0.03,tau=0.01) 
-    n_games = 2  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 200, alpha= 0.000001, beta= 0.000001, gamma= 0.99, noise= 0) 
+    n_games = 1000  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  'plot/FetchReachPlot1.png'
-    figure_file2 = 'plot/FetchReachPlot2.png'
-    figure_file3 = 'plot/FetchReachPlot3.png'
-    figure_file4 = 'plot/FetchReachPlot4.png'
+    figure_file = 'FetchReachPlotMeanGen.png'
+    figure_file2 = 'FetchReachPlotMean100.png'
+    figure_file3 = 'FetchReachPlotScores.png'
+    figure_file4 = 'FetchReachPlotAll.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
@@ -62,13 +62,10 @@ def main():
                 goal = observation_["desired_goal"]
                 goal_set = True
             observation_= transformObservation(observation_)
-
-            reward = euclidDistanceNegative(observation, goal)
-            if(reward>-0.2):
-                reward= reward*0.5
             
-            if j < 25 and j > 23: 
-                print(reward)
+            reward = euclidDistanceNegative(observation, goal)
+            if done == True or done == 1:
+                print("ended")
 
             score += reward  # Actualizar la puntuación acumulada
             agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
