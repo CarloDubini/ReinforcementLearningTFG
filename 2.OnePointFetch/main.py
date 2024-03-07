@@ -14,8 +14,8 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 300, alpha= 0.000001, beta= 0.000002, batch_size= 100, gamma= 0.99, noise= 0.01) 
-    n_games = 5000  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 250, alpha= 0.000001, beta= 0.000002, batch_size= 100, gamma= 0.99, noise= 0.01) 
+    n_games = 3000  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
@@ -59,10 +59,20 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
+            if goal_set == False:
+                goal = observation_["desired_goal"]
+                goal_set = True
             observation_= transformObservation(observation_)
+            
+            reward = euclidDistanceNegative(observation_, goal)
+            if j < 48 and j > 42:
+                print(reward)
                 
             if(reward>-0.2):
                 reward= reward*0.5
+            
+            if j < 25 and j > 23: 
+                print(reward)
 
             score += reward  # Actualizar la puntuación acumulada
             agent.remember(observation, action, reward, observation_, done)  # Almacenar la transición

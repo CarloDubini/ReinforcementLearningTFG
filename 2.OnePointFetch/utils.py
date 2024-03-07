@@ -9,7 +9,6 @@ def plot_learning_curve(x, scores, figure_file, number=100):
     plt.plot(x, running_avg)
     plt.title('Running average of previous scores')
     plt.savefig(figure_file)
-    plt.clf()
 
 def plot_learning_curve_three(x, scores, figure_file, number=100):
     running_avg_global = np.zeros(len(scores))
@@ -22,10 +21,11 @@ def plot_learning_curve_three(x, scores, figure_file, number=100):
     plt.plot(x, running_avg, 'g')
     plt.title('R = mean global, B = Last 100 mean, K = scores')
     plt.savefig(figure_file)
+    plt.clf()
 
 
 def transformObservation(obs):
-    observation = np.concatenate((obs['observation'], obs['desired_goal']),axis=None)
+    observation = np.concatenate((obs['observation'][0:3]),axis=None)
     return observation
 
 def euclidDistanceNegative(observation, goal):
