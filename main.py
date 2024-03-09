@@ -26,16 +26,16 @@ def main():
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    load_checkpoint = False  # Bandera para cargar un punto de control previo
+    load_checkpoint = True  # Bandera para cargar un punto de control previo
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint:
         n_steps = 0
         while n_steps <= agent.batch_len:
-            observation = env.reset()
+            observation = transformObservation(env.reset()[0])
             action = env.action_space.sample()
-            # observation = np.concatenate((env.observation_space['observation'].sample(), env.observation_space['desired_goal'].sample()),axis=None)
             observation_, reward, done, info, _ = env.step(action)
+            observation_= transformObservation(observation_)
             agent.remember(observation, action, reward, observation_, done)
             n_steps += 1
         agent.learn()
@@ -45,8 +45,7 @@ def main():
         evaluate = False
 
    
-    goal = [0,0,0]
-    goal_set = False
+    
     FinalScore = 0
     # Ciclo principal
     for i in range(n_games):
@@ -60,7 +59,7 @@ def main():
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             observation_= transformObservation(observation_)
-                
+            print(reward)
             if(reward>-0.2):
                 reward= reward*0.5
 
