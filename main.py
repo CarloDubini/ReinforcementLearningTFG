@@ -3,6 +3,7 @@ import gymnasium as gym
 import numpy as np
 from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared
 from Actor import Actor
+from HER import applyHER
 
 def main():
     # Creación del entorno
@@ -26,10 +27,12 @@ def main():
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    load_checkpoint = True  # Bandera para cargar un punto de control previo
+    continue_training = True # Flag con el objetivo de continuar entrenamientos 
+    load_checkpoint = False  # Flag para cargar un punto de control previo
+    train_with_HER = False # Aplicar HER durante el entrenamiento
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
-    if load_checkpoint:
+    if load_checkpoint or continue_training:
         n_steps = 0
         while n_steps <= agent.batch_len:
             observation = transformObservation(env.reset()[0])
@@ -40,7 +43,10 @@ def main():
             n_steps += 1
         agent.learn()
         agent.load_models()
-        evaluate = True
+        if load_checkpoint:
+            evaluate = True
+        else:
+            evaluate = False
     else:
         evaluate = False
 
@@ -58,12 +64,11 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
-            observation_= transformObservation(observation_)
-            print(reward)
-            if(reward>-0.2):
-                reward= reward*0.5
-
             score += reward  # Actualizar la puntuación acumulada
+            new_goal = observation_['achieved_goal']
+            if train_with_HER:
+                applyHER(agent, observation, action, observation_, new_goal, done,  euclidDistanceNegative)
+
             agent.remember(observation, action, reward, observation_, done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
