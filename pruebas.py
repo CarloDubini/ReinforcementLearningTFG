@@ -12,9 +12,9 @@ numpyArray= np.concatenate((obs[0:3],env.observation_space['desired_goal'].sampl
 
 env.set_goal()
 '''
-x = np.array([1,1,1])
+x = np.array([1,2,3,4,5,6,7,8,9,10,11,12])
 y = np.array([3,3,3])
-print(np.linalg.norm(x-y))
-
+observation_HER = np.concatenate((x[0:10], y), axis= 0)
+print(observation_HER)
 
 

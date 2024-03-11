@@ -1,7 +1,7 @@
 import time
 import gymnasium as gym
 import numpy as np
-from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared
+from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
 from Actor import Actor
 from HER import applyHER
 
@@ -16,7 +16,7 @@ def main():
  
     # Convert list to an array
     agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 300, alpha= 0.000001, beta= 0.000002, batch_size= 100, gamma= 0.99, noise= 0.01) 
-    n_games = 5000  # Número de episodios a jugar
+    n_games = 200  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
@@ -29,7 +29,7 @@ def main():
     score_history = []  # Lista para almacenar la puntuación en cada episodio
     continue_training = True # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
-    train_with_HER = False # Aplicar HER durante el entrenamiento
+    train_with_HER = True # Aplicar HER durante el entrenamiento
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint or continue_training:
@@ -64,11 +64,17 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
+            print(reward)
             score += reward  # Actualizar la puntuación acumulada
             new_goal = new_observation['achieved_goal']
-            if train_with_HER:
-                applyHER(agent, observation, action, new_observation, new_goal, done,  euclidDistanceNegative)
+            new_observation_HER = transformObservationHER(new_observation)
+            
+            if train_with_HER:  
+                new_observation_HER = transformObservationHER(new_observation)
+                observation_HER = np.concatenate((observation[0:10], new_goal), axis= 0)
+                applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
 
+            new_observation = transformObservation(new_observation)
             agent.remember(observation, action, reward, new_observation, done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
