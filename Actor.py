@@ -114,16 +114,16 @@ class Actor:
         state, action, reward, new_state, done = self.replayMemory.sample_buffer(self.batch_len)
         
         states = tf.convert_to_tensor(state, dtype=tf.float32)
-        states_ = tf.convert_to_tensor(new_state, dtype=tf.float32)
+        new_states = tf.convert_to_tensor(new_state, dtype=tf.float32)
         actions = tf.convert_to_tensor(action, dtype=tf.float32)
         rewards = tf.convert_to_tensor(reward, dtype=tf.float32)
         
         with tf.GradientTape() as tape:
-            target_actions = self.target_actor_net(states_)
-            critic_value_ = tf.squeeze(self.target_critic_net(states_, target_actions),1)
+            target_actions = self.target_actor_net(new_states)
+            target_critic_value = tf.squeeze(self.target_critic_net(new_states, target_actions),1)
             critic_value = tf.squeeze(self.critic_net(states, actions), 1)
 
-            target = rewards + self.gamma*critic_value_*(1-done)
+            target = rewards + self.gamma*target_critic_value*(1-done)
             critic_loss = keras.losses.MSE(target, critic_value)
         
         critic_network_gradient = tape.gradient(critic_loss, self.critic_net.trainable_variables)

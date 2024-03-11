@@ -37,9 +37,9 @@ def main():
         while n_steps <= agent.batch_len:
             observation = transformObservation(env.reset()[0])
             action = env.action_space.sample()
-            observation_, reward, done, info, _ = env.step(action)
-            observation_= transformObservation(observation_)
-            agent.remember(observation, action, reward, observation_, done)
+            new_observation, reward, done, info, _ = env.step(action)
+            new_observation= transformObservation(new_observation)
+            agent.remember(observation, action, reward, new_observation, done)
             n_steps += 1
         agent.learn()
         agent.load_models()
@@ -63,16 +63,16 @@ def main():
         j=0
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
-            observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
+            new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             score += reward  # Actualizar la puntuación acumulada
-            new_goal = observation_['achieved_goal']
+            new_goal = new_observation['achieved_goal']
             if train_with_HER:
-                applyHER(agent, observation, action, observation_, new_goal, done,  euclidDistanceNegative)
+                applyHER(agent, observation, action, new_observation, new_goal, done,  euclidDistanceNegative)
 
-            agent.remember(observation, action, reward, observation_, done)  # Almacenar la transición
+            agent.remember(observation, action, reward, new_observation, done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
-            observation = observation_  # Actualizar el estado actual
+            observation = new_observation  # Actualizar el estado actual
             
             j+=1
         
