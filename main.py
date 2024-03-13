@@ -1,7 +1,7 @@
 import time
 import gymnasium as gym
 import numpy as np
-from utils import euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
+from utils import calcularRewardCuadratico, euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
 from Actor import Actor
 from HER import applyHER
 
@@ -27,6 +27,7 @@ def main():
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
+    cuadratic_negative =False
     continue_training = True # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
     train_with_HER = True # Aplicar HER durante el entrenamiento
@@ -64,11 +65,11 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
+            reward = calcularRewardCuadratico(reward,cuadratic_negative)
             score += reward  # Actualizar la puntuación acumulada
-            new_goal = new_observation['achieved_goal']
-            new_observation_HER = transformObservationHER(new_observation)
-            
+                        
             if train_with_HER:  
+                new_goal = new_observation['achieved_goal']
                 new_observation_HER = transformObservationHER(new_observation)
                 observation_HER = np.concatenate((observation[0:10], new_goal), axis= 0)
                 applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
