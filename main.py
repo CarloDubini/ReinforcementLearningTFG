@@ -27,10 +27,10 @@ def main():
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    cuadratic_negative = True
+    cuadratic_negative = False
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
-    train_with_HER = True # Aplicar HER durante el entrenamiento
+    train_with_HER = False # Aplicar HER durante el entrenamiento
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint or continue_training:
@@ -65,6 +65,9 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
+
+            
+
             if cuadratic_negative:
                     reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
             score += reward  # Actualizar la puntuación acumulada            
