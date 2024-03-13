@@ -39,7 +39,9 @@ def euclidDistanceNegative(observation, goal):
 def euclidDistanceNegativeTimesSquared(observation, goal):
     a = (observation[0], observation[1], observation[2])
     b = (goal[0], goal[1], goal[2])
-    reward = math.pow(100 * distance.euclidean(a, b),2)
+    #Multiplicamos la distancia por 100 para medir la distancia en cm en vez de en metros. 
+    #La razón de esta decisión es que cuando multiplicas dos numeros menores que uno el reward será menor.
+    reward = math.pow(100 * distance.euclidean(a, b),2) 
     return -reward
 
 def calcularRewardCuadratico(reward,cuadratico):
