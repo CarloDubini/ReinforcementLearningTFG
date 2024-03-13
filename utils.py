@@ -16,7 +16,6 @@ def plot_learning_curve_three(x, scores, figure_file, number=100):
     for i in range(len(running_avg)):
         running_avg[i] = np.mean(scores[max(0, i-number):(i+1)])
         running_avg_global[i] = np.mean(scores[max(0, i-len(scores)):(i+1)])
-    plt.plot(x, scores, 'k')
     plt.plot(x, running_avg_global, 'y')
     plt.plot(x, running_avg, 'g')
     plt.title('Y = mean global, B = Last 100 mean, K = scores')
@@ -42,3 +41,9 @@ def euclidDistanceNegativeTimesSquared(observation, goal):
     b = (goal[0], goal[1], goal[2])
     reward = math.pow(100 * distance.euclidean(a, b),2)
     return -reward
+
+def calcularRewardCuadratico(reward,cuadratico):
+    if(cuadratico):
+        return reward*reward
+    else:
+        return reward
