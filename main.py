@@ -16,14 +16,14 @@ def main():
  
     # Convert list to an array
     agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 300, alpha= 0.000001, beta= 0.000002, batch_size= 100, gamma= 0.99, noise= 0.01) 
-    n_games = 200  # Número de episodios a jugar
+    n_games = 20  # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  'plot/FetchReachPlot1.png'
-    figure_file2 = 'plot/FetchReachPlot2.png'
-    figure_file3 = 'plot/FetchReachPlot3.png'
-    figure_file4 = 'plot/FetchReachPlot4.png'
+    figure_file =  'plot/FetchReachPlot1HER2.png'
+    figure_file2 = 'plot/FetchReachPlot2HER2.png'
+    figure_file3 = 'plot/FetchReachPlot3HER2.png'
+    figure_file4 = 'plot/FetchReachPlot4HER2.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
@@ -64,7 +64,6 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
-            print(reward)
             score += reward  # Actualizar la puntuación acumulada
             new_goal = new_observation['achieved_goal']
             new_observation_HER = transformObservationHER(new_observation)
@@ -102,14 +101,26 @@ def main():
 
     print('Puntuacion Final:',FinalScore)
     # Graficar la curva de aprendizaje si no se cargó un punto de control previo
+
+    first_training = np.array([])
+
+    if continue_training:
+        first_training = np.loadtxt("puntuacionesConHER.txt", delimiter= ",")
+    
+    score_history = np.array(score_history)
+
+    score_history = np.concatenate((first_training, score_history), axis= 0)
+
     if not load_checkpoint:
-        x = [i + 1 for i in range(n_games)]
+        x = [i + 1 for i in range(score_history.shape[0])]
         plot_learning_curve(x, score_history, figure_file)
         plot_learning_curve(x, score_history, figure_file2 , n_games)
         plot_learning_curve(x, score_history, figure_file3 , 3)
         plot_learning_curve_three(x, score_history, figure_file4, n_games)
     
     env.close()
+
+    np.savetxt("puntuacionesConHER.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()
