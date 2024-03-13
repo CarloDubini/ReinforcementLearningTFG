@@ -27,8 +27,8 @@ def main():
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    cuadratic_negative =False
-    continue_training = True # Flag con el objetivo de continuar entrenamientos 
+    cuadratic_negative = True
+    continue_training = False # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
     train_with_HER = True # Aplicar HER durante el entrenamiento
 
@@ -65,15 +65,18 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
-            reward = calcularRewardCuadratico(reward,cuadratic_negative)
-            score += reward  # Actualizar la puntuación acumulada
-                        
+            if cuadratic_negative:
+                    reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
+            score += reward  # Actualizar la puntuación acumulada            
             if train_with_HER:  
                 new_goal = new_observation['achieved_goal']
                 new_observation_HER = transformObservationHER(new_observation)
                 observation_HER = np.concatenate((observation[0:10], new_goal), axis= 0)
-                applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
-
+                if cuadratic_negative:
+                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegativeTimesSquared)
+                else:    
+                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
+            
             new_observation = transformObservation(new_observation)
             agent.remember(observation, action, reward, new_observation, done)  # Almacenar la transición
             if not load_checkpoint:
