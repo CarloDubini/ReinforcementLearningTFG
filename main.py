@@ -1,4 +1,5 @@
 import time
+from scipy.spatial import distance
 import gymnasium as gym
 import numpy as np
 from utils import calcularRewardCuadratico, euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
@@ -15,22 +16,23 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 300, alpha= 0.000001, beta= 0.000002, batch_size= 100, gamma= 0.99, noise= 0.01) 
-    n_games = 20  # Número de episodios a jugar
-    max_iter = 50
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.01) 
+    n_games = 5000  # Número de episodios a jugar
+    max_iter = 20
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  'plot/FetchReachPlot1HER2.png'
-    figure_file2 = 'plot/FetchReachPlot2HER2.png'
-    figure_file3 = 'plot/FetchReachPlot3HER2.png'
-    figure_file4 = 'plot/FetchReachPlot4HER2.png'
+    figure_file =  'plot/FetchReachPlot1HER.png'
+    figure_file2 = 'plot/FetchReachPlot2HER.png'
+    figure_file3 = 'plot/FetchReachPlot3HER.png'
+    figure_file4 = 'plot/FetchReachPlot4HER.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    cuadratic_negative = False
+    cuadratic_negative = False #Flag para cambiar la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
-    train_with_HER = False # Aplicar HER durante el entrenamiento
+    train_with_HER = True # Aplicar HER durante el entrenamiento
+    time_to_reward = True
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint or continue_training:
@@ -69,7 +71,11 @@ def main():
             
 
             if cuadratic_negative:
-                    reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
+                reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
+            
+            if time_to_reward and distance.euclidean(new_observation['observation'][0:3], new_observation['desired_goal']) > 0.1:
+                reward += -j
+            
             score += reward  # Actualizar la puntuación acumulada            
             if train_with_HER:  
                 new_goal = new_observation['achieved_goal']
