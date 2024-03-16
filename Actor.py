@@ -82,7 +82,6 @@ class Actor:
 
     def load_models(self):
         print('Cargando modelos')
-        print(self.actor_net.checkpoint_file)
         self.actor_net.load_weights(self.actor_net.checkpoint_file)
         self.target_actor_net.load_weights(self.target_actor_net.checkpoint_file)
 
