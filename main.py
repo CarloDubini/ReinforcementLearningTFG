@@ -30,12 +30,13 @@ def main():
     score_history = []  # Lista para almacenar la puntuación en cada episodio
     cuadratic_negative = False #Flag para cambiar la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
-    load_checkpoint = False  # Flag para cargar un punto de control previo
-    train_with_HER = True # Aplicar HER durante el entrenamiento
-    time_to_reward = True
+    load_checkpoint = True  # Flag para cargar un punto de control previo
+    train_with_HER = False # Aplicar HER durante el entrenamiento
+    time_to_reward = False
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint or continue_training:
+        
         n_steps = 0
         while n_steps <= agent.batch_len:
             observation = transformObservation(env.reset()[0])
@@ -76,7 +77,10 @@ def main():
             if time_to_reward and distance.euclidean(new_observation['observation'][0:3], new_observation['desired_goal']) > 0.1:
                 reward += -j
             
-            score += reward  # Actualizar la puntuación acumulada            
+            if(reward < -0.1):
+                reward=reward*0.5
+            score += reward  # Actualizar la puntuación acumulada  
+
             if train_with_HER:  
                 new_goal = new_observation['achieved_goal']
                 new_observation_HER = transformObservationHER(new_observation)
@@ -105,7 +109,7 @@ def main():
         if avg_score > best_score:
             best_score = avg_score
             # Guardar los modelos del agente si no se cargó un punto de control previo
-            if not load_checkpoint:
+            if (not load_checkpoint) and (len(score_history)>200):
                  agent.save_models()
 
         # Imprimir información sobre el episodio actual
