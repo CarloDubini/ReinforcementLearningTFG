@@ -16,8 +16,8 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.01) 
-    n_games = 5000  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.001) 
+    n_games = 10000  # Número de episodios a jugar
     max_iter = 20
 
     # Archivo para guardar la gráfica de rendimiento
@@ -30,7 +30,7 @@ def main():
     score_history = []  # Lista para almacenar la puntuación en cada episodio
     cuadratic_negative = False #Flag para cambiar la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
-    load_checkpoint = False  # Flag para cargar un punto de control previo
+    load_checkpoint = True  # Flag para cargar un punto de control previo
     train_with_HER = True # Aplicar HER durante el entrenamiento
     time_to_reward = True
 
@@ -73,8 +73,8 @@ def main():
             if cuadratic_negative:
                 reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
             
-            if time_to_reward and distance.euclidean(new_observation['observation'][0:3], new_observation['desired_goal']) > 0.1:
-                reward += -j
+            if time_to_reward and distance.euclidean(new_observation['observation'][0:3], new_observation['desired_goal']) > 0.05:
+                reward += -j * 0.01
             
             score += reward  # Actualizar la puntuación acumulada            
             if train_with_HER:  
