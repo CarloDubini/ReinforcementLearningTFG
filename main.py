@@ -8,7 +8,7 @@ from HER import applyHER
 
 def main():
     # Creación del entorno
-    env = gym.make('FetchReachDense-v2',render_mode="human")
+    env = gym.make('FetchPushDense-v2',render_mode="human")
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
@@ -17,22 +17,22 @@ def main():
  
     # Convert list to an array
     agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.001) 
-    n_games = 5000  # Número de episodios a jugar
-    max_iter = 30
+    n_games = 300  # Número de episodios a jugar
+    max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  'plot/FetchReachPlot1HER.png'
-    figure_file2 = 'plot/FetchReachPlot2HER.png'
-    figure_file3 = 'plot/FetchReachPlot3HER.png'
-    figure_file4 = 'plot/FetchReachPlot4HER.png'
+    figure_file =  'plot/FetchPushPlot1.png'
+    figure_file2 = 'plot/FetchPushPlot2.png'
+    figure_file3 = 'plot/FetchPushPlot3.png'
+    figure_file4 = 'plot/FetchPushPlot4.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    cuadratic_negative = True #Flag para cambiar la recompensa cuadrática negativa
+    cuadratic_negative = False #Flag para cambiar la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
     train_with_HER = False # Aplicar HER durante el entrenamiento
-    time_to_reward = False
+    time_to_reward = True # Aplicar j a la recompensa para tener en cuenta la velocidad al objetivo.
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint or continue_training:
@@ -72,10 +72,10 @@ def main():
             
 
             if cuadratic_negative:
-                reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
+                reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][3:6], new_observation['desired_goal'])
             
-            if time_to_reward and distance.euclidean(new_observation['observation'][0:3], new_observation['desired_goal']) > 0.1:
-                reward += -j
+            if time_to_reward and distance.euclidean(new_observation['observation'][3:6], new_observation['desired_goal']) > 0.1:
+                reward += -j *0.01
             
             score += reward  # Actualizar la puntuación acumulada  
 

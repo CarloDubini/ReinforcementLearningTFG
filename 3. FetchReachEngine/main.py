@@ -18,7 +18,7 @@ def main():
     # Convert list to an array
     agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.001) 
     n_games = 5000  # Número de episodios a jugar
-    max_iter = 30
+    max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file =  'plot/FetchReachPlot1HER.png'
@@ -75,7 +75,7 @@ def main():
                 reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][0:3], new_observation['desired_goal'])
             
             if time_to_reward and distance.euclidean(new_observation['observation'][0:3], new_observation['desired_goal']) > 0.1:
-                reward += -j
+                reward += -j *0.01
             
             score += reward  # Actualizar la puntuación acumulada  
 
