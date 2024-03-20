@@ -2,7 +2,7 @@ import time
 from scipy.spatial import distance
 import gymnasium as gym
 import numpy as np
-from utils import calcularRewardCuadratico, euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
+from utils import cubeReward,calcularRewardCuadratico, euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
 from Actor import Actor
 from HER import applyHER
 
@@ -16,8 +16,8 @@ def main():
     numpyArray= transformObservation(obs_array)
  
     # Convert list to an array
-    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.001) 
-    n_games = 300  # Número de episodios a jugar
+    agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.002) 
+    n_games = 5000 # Número de episodios a jugar
     max_iter = 50
 
     # Archivo para guardar la gráfica de rendimiento
@@ -31,7 +31,7 @@ def main():
     cuadratic_negative = False #Flag para cambiar la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     load_checkpoint = False  # Flag para cargar un punto de control previo
-    train_with_HER = False # Aplicar HER durante el entrenamiento
+    train_with_HER = True # Aplicar HER durante el entrenamiento
     time_to_reward = True # Aplicar j a la recompensa para tener en cuenta la velocidad al objetivo.
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
@@ -68,7 +68,6 @@ def main():
         while not done and j<max_iter:
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
-
             
 
             if cuadratic_negative:
@@ -77,18 +76,21 @@ def main():
             if time_to_reward and distance.euclidean(new_observation['observation'][3:6], new_observation['desired_goal']) > 0.1:
                 reward += -j *0.01
             
+            reward+= cubeReward(new_observation)
+
             score += reward  # Actualizar la puntuación acumulada  
 
             if train_with_HER:  
                 new_goal = new_observation['achieved_goal']
                 new_observation_HER = transformObservationHER(new_observation)
-                observation_HER = np.concatenate((observation[0:10], new_goal), axis= 0)
+                observation_HER = np.concatenate((observation[0:25], new_goal), axis= 0)
                 if cuadratic_negative:
                     applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegativeTimesSquared)
                 else:    
                     applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
             
             new_observation = transformObservation(new_observation)
+
             agent.remember(observation, action, reward, new_observation, done)  # Almacenar la transición
             if not load_checkpoint:
                 agent.learn()  # Aprender de la transición
@@ -97,7 +99,7 @@ def main():
             j+=1
         
         
-        if(n_games-i<=200):#
+        if(n_games-i<=200):
             FinalScore= FinalScore+score
         
         score_history.append(score)  # Almacenar la puntuación del episodio

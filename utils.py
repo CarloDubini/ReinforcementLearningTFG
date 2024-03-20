@@ -32,12 +32,12 @@ def transformObservationHER(obs):
 
 
 def euclidDistanceNegative(observation, goal):
-    a = (observation[0], observation[1], observation[2])
+    a = (observation[3], observation[4], observation[5])
     b = (goal[0], goal[1], goal[2])
     return -distance.euclidean(a, b)
 
 def euclidDistanceNegativeTimesSquared(observation, goal):
-    a = (observation[0], observation[1], observation[2])
+    a = (observation[3], observation[4], observation[5])
     b = (goal[0], goal[1], goal[2])
     #Multiplicamos la distancia por 100 para medir la distancia en cm en vez de en metros. 
     #La razón de esta decisión es que cuando multiplicas dos numeros menores que uno el reward será menor.
@@ -49,3 +49,13 @@ def calcularRewardCuadratico(reward,cuadratico):
         return reward*reward
     else:
         return reward
+    
+
+def euclidDistanceNegativeCube(observation):
+    return -math.sqrt(observation[6]**2+ observation[7]**2 + observation[8]**2)
+
+def cubeReward(observation):
+    o = transformObservation(observation)
+    reward = euclidDistanceNegativeCube(o)
+    return reward*0.5
+
