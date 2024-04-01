@@ -2,7 +2,7 @@ import time
 from scipy.spatial import distance
 import gymnasium as gym
 import numpy as np
-from utils import cubeReward,calcularRewardCuadratico, euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
+from utils import *
 from Actor import Actor
 from HER import applyHER
 
@@ -17,8 +17,8 @@ def main():
  
     # Convert list to an array
     agent = Actor(input_dims=numpyArray.shape, environment=env, n_actions=n_actions, fc_dims= 350, alpha= 0.00001, beta= 0.00002, batch_size= 100, gamma= 0.99, noise= 0.002) 
-    n_games = 5000 # Número de episodios a jugar
-    max_iter = 50
+    n_games = 1000 # Número de episodios a jugar
+    max_iter = 100
 
     # Archivo para guardar la gráfica de rendimiento
     figure_file =  'plot/FetchPushPlot1.png'
@@ -69,10 +69,11 @@ def main():
             action = agent.choose_action(observation, evaluate)  # Elegir una acción
             new_observation, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             
-
+            reward = pushRewardDistanceNegative(new_observation['observation'], new_observation['desired_goal'])
+            """
             if cuadratic_negative:
                 reward = euclidDistanceNegativeTimesSquared(new_observation['observation'][3:6], new_observation['desired_goal'])
-            
+            """
             if time_to_reward and distance.euclidean(new_observation['observation'][3:6], new_observation['desired_goal']) > 0.1:
                 reward += -j *0.01
             
@@ -85,9 +86,9 @@ def main():
                 new_observation_HER = transformObservationHER(new_observation)
                 observation_HER = np.concatenate((observation[0:25], new_goal), axis= 0)
                 if cuadratic_negative:
-                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegativeTimesSquared)
+                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done)
                 else:    
-                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
+                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done)
             
             new_observation = transformObservation(new_observation)
 

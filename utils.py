@@ -54,6 +54,19 @@ def calcularRewardCuadratico(reward,cuadratico):
 def euclidDistanceNegativeCube(observation):
     return -math.sqrt(observation[6]**2+ observation[7]**2 + observation[8]**2)
 
+def pushRewardDistanceNegative(observation, goal):
+    efector = (observation[0], observation[1], observation[2])
+    cubo = (observation[3], observation[4], observation[5])
+    goal = (goal[0], goal[1], goal[2])
+    #Multiplicamos la distancia por 100 para medir la distancia en cm en vez de en metros. 
+    #La razón de esta decisión es que cuando multiplicas dos numeros menores que uno el reward será menor.
+    distCuboEfector = distance.euclidean(efector, cubo)
+    distCuboGoal = distance.euclidean(goal, cubo)
+    reward = -distCuboGoal
+    if distCuboGoal > 0.1:
+        reward += -(distCuboEfector * 0.5)
+    return reward
+
 def cubeReward(observation):
     o = transformObservation(observation)
     reward = euclidDistanceNegativeCube(o)
