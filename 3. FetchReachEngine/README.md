@@ -3,6 +3,6 @@ paquetes a instalar:
  - tensorflow
  - gym
  - gym[classic_control]
- - gymnasium.robotics
+ - gymnasium-robotics
  - mujoco
  - keras
