@@ -1,8 +1,8 @@
 import tensorflow as tf
-from keras.api._v2.keras.optimizers import Adam
-from keras.api._v2.keras.layers import Dense
+from keras.api.optimizers import Adam
+from keras.api.layers import Dense
 import numpy as np
-import keras.api._v2.keras as keras
+import keras.api as keras
 
 from ReplayBuffer import ReplayBuffer
 from ActorNetwork import ActorNetwork
@@ -10,7 +10,7 @@ from CriticNetwork import CriticNetwork
 
 class Actor:
     """El Actor DDPG, que incluye una red crítica y una red de actor, generalizado para su uso en cualquier entorno sabiendo los parámetros de entrada (Sensores en REAS) y número de acciones a tomar"""
-    def __init__(self, input_dims, alpha=0.001, beta=0.002, environment=None, gamma=0.99, n_actions=2, max_size=1000000, tau=0.005, fc1=400, fc2=300, batch_size=64, noise=0.1):
+    def __init__(self, input_dims, alpha=0.001, beta=0.002, environment=None, gamma=0.99, n_actions=2, max_size=1000000, tau=0.005, dim_layers= [100,50], batch_size=50, noise=0.1):
         """Utiliza alpha y beta para los porcentajes de aprendizaje de las redes, y gamma para cambiar el objetivo de la red crítica, así como tau se utiliza para controlar la tasa a la que se actualizan los pesos de la red objetivo.
         Los fc's sirven para el número de neuronas de las redes. n_actions es la cantidad de acciones finales a elegir."""
         
@@ -28,23 +28,23 @@ class Actor:
         self.tau = tau
         self.batch_len = batch_size
         self.n_actions = n_actions
-
-        #fc_dims= float(round((input_dims[0]+n_actions)*0.6)) # numero de neuronas escondidas en cada capa
-        fc_dims= 500
+        self.alpha = alpha
+        self.beta= beta
         
-        self.actor_net = ActorNetwork(n_actions=n_actions, name='actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
-        self.target_actor_net = ActorNetwork(n_actions=n_actions, name='target_actor',fc1_dims=fc_dims,fc2_dims=fc_dims)
+        self.actor_net = ActorNetwork(n_actions=self.n_actions, name='actor',layers_size = dim_layers)
+        self.target_actor_net = ActorNetwork(n_actions=self.n_actions, name='target_actor',layers_size = dim_layers)
 
-        self.actor_net.compile( optimizer=Adam(learning_rate=alpha))
-        self.target_actor_net.compile( optimizer=Adam(learning_rate=alpha))
+        self.actor_net.compile( optimizer=Adam(learning_rate=self.alpha))
+        self.target_actor_net.compile( optimizer=Adam(learning_rate=self.alpha))
 
-        self.critic_net = CriticNetwork(name='critic')
-        self.target_critic_net = CriticNetwork(name='target_critic')
+        self.critic_net = CriticNetwork(name='critic',layers_size = dim_layers)
+        self.target_critic_net = CriticNetwork(name='target_critic',layers_size = dim_layers)
         
-        self.critic_net.compile( optimizer=Adam(learning_rate=beta))
-        self.target_critic_net.compile( optimizer=Adam(learning_rate=beta))
+        self.critic_net.compile( optimizer=Adam(learning_rate=self.beta))
+        self.target_critic_net.compile( optimizer=Adam(learning_rate=self.beta))
 
         self.update_network_parameters(tau=1)
+
 
     def update_network_parameters(self, tau=None):
         """Actualiza los valores de peso según tau, controlando esta a qué velocidad se actualizan"""
@@ -94,9 +94,13 @@ class Actor:
         possible_actions = self.actor_net(state)
         if not evaluate:
             possible_actions += tf.random.normal(shape=[self.n_actions], mean=0.0, stddev=self.noise)
-        possible_actions = tf.clip_by_value(possible_actions, self.min_action, self.max_action)
 
-        chosen_action = possible_actions[0]
+        action_range = self.max_action - self.min_action
+
+        scaled_actions = self.min_action + (possible_actions + 1.0) * (action_range / 2.0)
+        scaled_actions = tf.clip_by_value(scaled_actions, self.min_action, self.max_action)
+
+        chosen_action = scaled_actions[0]
 
         return chosen_action
     
@@ -107,17 +111,17 @@ class Actor:
         state, action, reward, new_state, done = self.replayMemory.sample_buffer(self.batch_len)
         
         states = tf.convert_to_tensor(state, dtype=tf.float32)
-        states_ = tf.convert_to_tensor(new_state, dtype=tf.float32)
+        new_states = tf.convert_to_tensor(new_state, dtype=tf.float32)
         actions = tf.convert_to_tensor(action, dtype=tf.float32)
         rewards = tf.convert_to_tensor(reward, dtype=tf.float32)
         
         with tf.GradientTape() as tape:
-            target_actions = self.target_actor_net(states_)
-            critic_value_ = tf.squeeze(self.target_critic_net(states_, target_actions),1)
+            target_actions = self.target_actor_net(new_states)
+            target_critic_value = tf.squeeze(self.target_critic_net(new_states, target_actions),1)
             critic_value = tf.squeeze(self.critic_net(states, actions), 1)
 
-            target = rewards + self.gamma*critic_value_*(1-done)
-            critic_loss = keras.losses.MSE(target, critic_value)
+            target = rewards + self.gamma*target_critic_value*(1-done)
+            critic_loss = keras.losses.mean_squared_error(target, critic_value)
         
         critic_network_gradient = tape.gradient(critic_loss, self.critic_net.trainable_variables)
 

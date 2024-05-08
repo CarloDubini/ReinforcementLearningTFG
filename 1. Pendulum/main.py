@@ -13,11 +13,11 @@ def main():
 
     # Creación del agente con el entorno y el número de acciones adecuados
     agent = Actor(input_dims=env.observation_space.shape, environment=env, n_actions=n_actions)
-    n_games = 500  # Número de episodios a jugar
-    max_steps= 300
+    n_games = 50  # Número de episodios a jugar
+    max_steps= 500
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file = 'pendulum2.png'
+    figure_file = 'penduloplotTraining.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
@@ -74,6 +74,8 @@ def main():
     if not load_checkpoint:
         x = [i + 1 for i in range(n_games)]
         plot_learning_curve(x, score_history, figure_file)
+
+    np.savetxt(f"puntuacionespendulo.txt", score_history, delimiter= ",")
 
 if __name__ == "__main__":
     main()
