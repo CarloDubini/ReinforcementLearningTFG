@@ -18,7 +18,7 @@ def main():
     
     #Lista de hiperparámetros:
 
-    n_games = 5000  # Número de episodios a jugar
+    n_games = 3000  # Número de episodios a jugar
     max_iter = 50
     dim_layers = [250, 150, 50]
     alpha = 0.00001

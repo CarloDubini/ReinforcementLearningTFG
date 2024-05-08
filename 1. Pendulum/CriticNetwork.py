@@ -1,8 +1,8 @@
 
 import os
 import tensorflow as tf
-from keras.api._v2.keras.layers import Dense
-import keras.api._v2.keras as keras
+from keras.api.layers import Dense
+import keras.api as keras
 
 class CriticNetwork(keras.Model):
     def __init__(self, fc1_dims=512, fc2_dims=512, name='critic', chkpt_dir='tmp\ddpg'):

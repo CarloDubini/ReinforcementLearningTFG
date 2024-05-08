@@ -30,8 +30,6 @@ class Actor:
         self.n_actions = n_actions
         self.alpha = alpha
         self.beta= beta
-
-        #fc_dims= float(round((input_dims[0]+n_actions)*0.6)) # numero de neuronas escondidas en cada capa
         
         self.actor_net = ActorNetwork(n_actions=self.n_actions, name='actor',layers_size = dim_layers)
         self.target_actor_net = ActorNetwork(n_actions=self.n_actions, name='target_actor',layers_size = dim_layers)
