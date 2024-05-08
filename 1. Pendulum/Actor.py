@@ -38,8 +38,8 @@ class Actor:
         self.actor_net.compile( optimizer=Adam(learning_rate=alpha))
         self.target_actor_net.compile( optimizer=Adam(learning_rate=alpha))
 
-        self.critic_net = CriticNetwork(name='critic',fc1_dims=fc_dims,fc2_dims=fc_dims)
-        self.target_critic_net = CriticNetwork(name='target_critic',fc1_dims=fc_dims,fc2_dims=fc_dims)
+        self.critic_net = CriticNetwork(name='critic')
+        self.target_critic_net = CriticNetwork(name='target_critic')
         
         self.critic_net.compile( optimizer=Adam(learning_rate=beta))
         self.target_critic_net.compile( optimizer=Adam(learning_rate=beta))
@@ -51,19 +51,19 @@ class Actor:
         if tau is None:
             tau = self.tau
         
-        weights = []
-        target_weights = self.target_actor_net.weights
+        # Actualización para la red del actor
+        actor_weights = self.actor_net.get_weights()
+        target_actor_weights = self.target_actor_net.get_weights()
+        new_actor_weights = [weight * tau + target_weight * (1 - tau) 
+                            for weight, target_weight in zip(actor_weights, target_actor_weights)]
+        self.target_actor_net.set_weights(new_actor_weights)
         
-        for i, weight in enumerate(self.actor_net.weights):
-            weights.append(weight * tau + target_weights[i] * (1 - tau))
-        self.target_actor_net.set_weights(weights)
-
-        weights = []
-        target_weights = self.target_critic_net.weights
-        
-        for i, weight in enumerate(self.critic_net.weights):
-            weights.append(weight * tau + target_weights[i] * (1 - tau))
-        self.target_critic_net.set_weights(weights)
+        # Actualización para la red del crítico
+        critic_weights = self.critic_net.get_weights()
+        target_critic_weights = self.target_critic_net.get_weights()
+        new_critic_weights = [weight * tau + target_weight * (1 - tau) 
+                            for weight, target_weight in zip(critic_weights, target_critic_weights)]
+        self.target_critic_net.set_weights(new_critic_weights)
 
     def remember(self, state, action, reward, new_state, done):
         """Guarda la transición en la memoria de replay"""

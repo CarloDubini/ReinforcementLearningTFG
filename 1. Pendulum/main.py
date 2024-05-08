@@ -9,17 +9,19 @@ def main():
     env = gym.make('Pendulum-v1',render_mode='human')
     n_actions = env.action_space.shape[0]
 
+
+
     # Creación del agente con el entorno y el número de acciones adecuados
     agent = Actor(input_dims=env.observation_space.shape, environment=env, n_actions=n_actions)
-    n_games = 20  # Número de episodios a jugar
-    max_steps= 1000
+    n_games = 500  # Número de episodios a jugar
+    max_steps= 300
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file = 'pendulum.png'
+    figure_file = 'pendulum2.png'
 
     best_score = env.reward_range[0]  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
-    load_checkpoint = True  # Bandera para cargar un punto de control previo
+    load_checkpoint = False  # Flag para cargar un punto de control previo
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if load_checkpoint:
@@ -46,7 +48,7 @@ def main():
         score = 0
         j = 0
         while not done and j < max_steps:
-            action = agent.choose_action(observation, evaluate)  # Elegir una acción
+            action = agent.choose_action(observation, evaluate) # Elegir una acción
             observation_, reward, done, info, _ = env.step(action)  # Realizar la acción en el entorno
             score += reward  # Actualizar la puntuación acumulada
             agent.remember(observation, action, reward, observation_[0], done)  # Almacenar la transición
@@ -59,7 +61,7 @@ def main():
         avg_score = np.mean(score_history[-100:])  # Calcular la puntuación media en los últimos 100 episodios
 
         # Actualizar la mejor puntuación si se supera
-        if avg_score > best_score:
+        if  j >= n_games/4 and avg_score > best_score:
             best_score = avg_score
             # Guardar los modelos del agente si no se cargó un punto de control previo
             if not load_checkpoint:
