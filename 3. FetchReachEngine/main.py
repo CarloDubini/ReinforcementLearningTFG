@@ -9,7 +9,7 @@ from HER import applyHER
 
 def main():
     # Creación del entorno
-    env = gym.make('FetchReachDense-v2',render_mode="human")
+    env = gym.make('FetchReach-v2',render_mode="human")
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
@@ -21,8 +21,8 @@ def main():
     n_games = 3000  # Número de episodios a jugar
     max_iter = 50
     dim_layers = [250, 150, 50]
-    alpha = 0.00001
-    beta = 0.00002
+    alpha = 0.0001
+    beta = 0.0002
     batch_size= 100
     gamma= 0.99
     noise= 0.001
@@ -31,18 +31,18 @@ def main():
                   alpha= alpha, beta= beta, batch_size= batch_size, gamma= gamma, noise= noise) 
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  f'plot/FetchReachPlot1HERa{alpha}b{beta}{dim_layers}noise{noise}.png'
-    figure_file2 = f'plot/FetchReachPlot2HERa{alpha}b{beta}{dim_layers}noise{noise}.png'
-    figure_file3 = f'plot/FetchReachPlot3HERa{alpha}b{beta}{dim_layers}noise{noise}.png'
-    figure_file4 = f'plot/FetchReachPlot4HERa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file =  f'plot/FetchReachPlot1NOHEDENSERa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file2 = f'plot/FetchReachPlot2NOHEDENSERa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file3 = f'plot/FetchReachPlot3NOHEDENSERa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file4 = f'plot/FetchReachPlot4NOHERDENSEa{alpha}b{beta}{dim_layers}noise{noise}.png'
 
     best_score = sys.float_info.min  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
     cuadratic_negative = False #Flag para cambiar a la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     explotation_mode = False  # Flag para cargar un punto de control previo y explotar el modelo
-    train_with_HER = True # Aplicar HER durante el entrenamiento
-    time_to_reward = True # Añadir a la recompensa una 
+    train_with_HER = False # Aplicar HER durante el entrenamiento
+    time_to_reward = False # Añadir a la recompensa una función temporal sparse de si está en el goal
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if explotation_mode or continue_training:
@@ -112,7 +112,7 @@ def main():
         avg_score = np.mean(score_history[-200:])  # Calcular la puntuación media en los últimos 100 episodios
 
         # Actualizar la mejor puntuación si se supera
-        if avg_score > best_score:
+        if avg_score > best_score and i > n_games/4:
             best_score = avg_score
             # Guardar los modelos del agente si no se cargó un punto de control previo
             if (not explotation_mode) and (len(score_history)>200):
@@ -143,7 +143,7 @@ def main():
     
     env.close()
 
-    np.savetxt(f"puntuacionesconHERa{alpha}b{beta}{dim_layers}noise{noise}.txt", score_history, delimiter= ",")
+    np.savetxt(f"puntuacionesNOHERSPARSE.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()
