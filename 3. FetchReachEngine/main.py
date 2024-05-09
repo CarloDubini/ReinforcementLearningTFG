@@ -18,7 +18,7 @@ def main():
     numpyArray= transformObservation(obs_array)
     #Lista de hiperparámetros:
 
-    n_games = 1500  # Número de episodios a jugar
+    n_games = 3000  # Número de episodios a jugar
     her_statistic = 0.5
     max_iter = 50
     dim_layers = [250, 150, 50]
@@ -144,7 +144,7 @@ def main():
     
     env.close()
 
-    np.savetxt(f"puntuacionesHERDENSE0.5.txt", score_history, delimiter= ",")
+    np.savetxt(f"puntuacionesHERDENSETTG0.5.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()

@@ -17,8 +17,8 @@ def calcular_medias(datos, ventana=100):
     return medias
 
 # Cargar los nombres de los archivos y los nombres de las series según la carpeta a analizar
-carpeta = "AnalisisHER"
-normalizar = False
+carpeta = "Analisisneuronas"
+normalizar = True
 eliminarPrimeros = False
 
 archivos = os.listdir(carpeta)
