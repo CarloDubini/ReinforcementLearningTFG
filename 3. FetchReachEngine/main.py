@@ -1,6 +1,7 @@
 import time
 from scipy.spatial import distance
 import gymnasium as gym
+import random as rnd
 import numpy as np
 import sys
 from utils import calcularRewardCuadratico, euclidDistanceNegative, plot_learning_curve, plot_learning_curve_three,transformObservation, euclidDistanceNegativeTimesSquared, transformObservationHER
@@ -9,21 +10,21 @@ from HER import applyHER
 
 def main():
     # Creación del entorno
-    env = gym.make('FetchReach-v2',render_mode="human")
+    env = gym.make('FetchReachDense-v2',render_mode="human")
     n_actions = env.action_space.shape[0]
 
     # Creación del agente con el entorno y el número de acciones adecuados
     obs_array=env.observation_space.sample()
     numpyArray= transformObservation(obs_array)
-    
     #Lista de hiperparámetros:
 
-    n_games = 3000  # Número de episodios a jugar
+    n_games = 1500  # Número de episodios a jugar
+    her_statistic = 0.5
     max_iter = 50
     dim_layers = [250, 150, 50]
     alpha = 0.0001
     beta = 0.0002
-    batch_size= 100
+    batch_size= 50
     gamma= 0.99
     noise= 0.001
     
@@ -31,18 +32,18 @@ def main():
                   alpha= alpha, beta= beta, batch_size= batch_size, gamma= gamma, noise= noise) 
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  f'plot/FetchReachPlot1NOHEDENSERa{alpha}b{beta}{dim_layers}noise{noise}.png'
-    figure_file2 = f'plot/FetchReachPlot2NOHEDENSERa{alpha}b{beta}{dim_layers}noise{noise}.png'
-    figure_file3 = f'plot/FetchReachPlot3NOHEDENSERa{alpha}b{beta}{dim_layers}noise{noise}.png'
-    figure_file4 = f'plot/FetchReachPlot4NOHERDENSEa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file =  f'plot/FetchReachPlot1HERSPARSa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file2 = f'plot/FetchReachPlot2HERSPARSa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file3 = f'plot/FetchReachPlot3HERSPARSEa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file4 = f'plot/FetchReachPlot4HERSPARSa{alpha}b{beta}{dim_layers}noise{noise}.png'
 
     best_score = sys.float_info.min  # Mejor puntuación inicializada con la peor posible
     score_history = []  # Lista para almacenar la puntuación en cada episodio
     cuadratic_negative = False #Flag para cambiar a la recompensa cuadrática negativa
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     explotation_mode = False  # Flag para cargar un punto de control previo y explotar el modelo
-    train_with_HER = False # Aplicar HER durante el entrenamiento
-    time_to_reward = False # Añadir a la recompensa una función temporal sparse de si está en el goal
+    train_with_HER = True # Aplicar HER durante el entrenamiento
+    time_to_reward = False # Añadir a la recompensa una 
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if explotation_mode or continue_training:
@@ -87,7 +88,7 @@ def main():
             
             score += reward  # Actualizar la puntuación acumulada  
 
-            if train_with_HER:  
+            if train_with_HER and rnd.random() < her_statistic:  
                 new_goal = new_observation['achieved_goal']
                 new_observation_HER = transformObservationHER(new_observation)
                 observation_HER = np.concatenate((observation[0:10], new_goal), axis= 0)
@@ -143,7 +144,7 @@ def main():
     
     env.close()
 
-    np.savetxt(f"puntuacionesNOHERSPARSE.txt", score_history, delimiter= ",")
+    np.savetxt(f"puntuacionesHERDENSE0.5.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()
