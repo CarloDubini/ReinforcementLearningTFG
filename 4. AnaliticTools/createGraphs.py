@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 # Función para normalizar un vector si se diera el caso
 def normalize_vector(vector):
-    min_val = 0
-    max_val = np.max(vector)
+    min_val = np.min(vector)
+    max_val = 0
     normalized_vector = (vector - min_val) / (max_val - min_val)
     return normalized_vector
 
@@ -17,8 +17,8 @@ def calcular_medias(datos, ventana=100):
     return medias
 
 # Cargar los nombres de los archivos y los nombres de las series según la carpeta a analizar
-carpeta = "AnalisisNeuronas"
-normalizar = False
+carpeta = "AnalisisRewardTruc"
+normalizar = True
 eliminarPrimeros = False
 
 archivos = os.listdir(carpeta)
