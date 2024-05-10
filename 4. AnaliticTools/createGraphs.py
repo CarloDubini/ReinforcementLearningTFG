@@ -17,12 +17,12 @@ def calcular_medias(datos, ventana=100):
     return medias
 
 # Cargar los nombres de los archivos y los nombres de las series según la carpeta a analizar
-carpeta = "AnalisisParametros"
+carpeta = "AnalisisParametros\\Noise" 
 normalizar = False
 eliminarPrimeros = False
 dimensionDatos = 1000
 ventana = 50
-grupos = 3
+grupos = 5
 
 archivos = os.listdir(carpeta)
 archivos = [os.path.join(carpeta, archivo) for archivo in archivos if archivo.endswith('.txt')]
@@ -52,5 +52,5 @@ for i, datos in enumerate(datos_normalizados):
         plt.ylabel('Recompensa media')
         #plt.title('Gráfica de Datos Normalizados')
         plt.legend()
-        plt.savefig(f'Gráfica{carpeta}generada{i//grupos}')
+        plt.savefig(f'PlotsFinales\\{carpeta}generada{i//grupos}') 
         plt.clf()
