@@ -18,12 +18,12 @@ def main():
     numpyArray= transformObservation(obs_array)
     #Lista de hiperparámetros:
 
-    n_games = 3000  # Número de episodios a jugar
-    her_statistic = 0.5
+    n_games = 1000  # Número de episodios a jugar
+    her_statistic = 0.8
     max_iter = 50
     dim_layers = [250, 150, 50]
-    alpha = 0.0001
-    beta = 0.0002
+    alpha = 0.001
+    beta = 0.0001
     batch_size= 50
     gamma= 0.99
     noise= 0.001
@@ -43,7 +43,7 @@ def main():
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     explotation_mode = False  # Flag para cargar un punto de control previo y explotar el modelo
     train_with_HER = True # Aplicar HER durante el entrenamiento
-    time_to_reward = False # Añadir a la recompensa una 
+    time_to_reward = True # Añadir a la recompensa una 
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if explotation_mode or continue_training:
@@ -144,7 +144,7 @@ def main():
     
     env.close()
 
-    np.savetxt(f"puntuacionesHERDENSETTG0.5.txt", score_history, delimiter= ",")
+    np.savetxt(f"punta{alpha}b{beta}bs{batch_size}noise{noise}.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()
