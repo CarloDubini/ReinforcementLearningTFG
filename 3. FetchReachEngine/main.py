@@ -22,8 +22,8 @@ def main():
     her_statistic = 0.8
     max_iter = 50
     dim_layers = [250, 150, 50]
-    alpha = 0.0001
-    beta = 0.0005
+    alpha = 0.001
+    beta = 0.0001
     batch_size= 50
     gamma= 0.99
     noise= 0.001
@@ -144,7 +144,7 @@ def main():
     
     env.close()
 
-    np.savetxt(f"punt{alpha}b{beta}bs{dim_layers}noise{noise}.txt", score_history, delimiter= ",")
+    np.savetxt(f"punta{alpha}b{beta}bs{batch_size}noise{noise}.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()
