@@ -18,12 +18,12 @@ def main():
     numpyArray= transformObservation(obs_array)
     #Lista de hiperparámetros:
 
-    n_games = 3000  # Número de episodios a jugar
-    her_statistic = 0.5
+    n_games = 1000  # Número de episodios a jugar
+    her_statistic = 0.8
     max_iter = 50
     dim_layers = [250, 150, 50]
     alpha = 0.0001
-    beta = 0.0002
+    beta = 0.0005
     batch_size= 50
     gamma= 0.99
     noise= 0.001
@@ -32,7 +32,7 @@ def main():
                   alpha= alpha, beta= beta, batch_size= batch_size, gamma= gamma, noise= noise) 
 
     # Archivo para guardar la gráfica de rendimiento
-    figure_file =  f'plot/FetchReachPlot1HERSPARSa{alpha}b{beta}{dim_layers}noise{noise}.png'
+    figure_file =  f'plot/FetchReachPlot1HERSPARSa{alpha}b{beta}bs{dim_layers}noise{noise}.png'
     figure_file2 = f'plot/FetchReachPlot2HERSPARSa{alpha}b{beta}{dim_layers}noise{noise}.png'
     figure_file3 = f'plot/FetchReachPlot3HERSPARSEa{alpha}b{beta}{dim_layers}noise{noise}.png'
     figure_file4 = f'plot/FetchReachPlot4HERSPARSa{alpha}b{beta}{dim_layers}noise{noise}.png'
@@ -43,7 +43,7 @@ def main():
     continue_training = False # Flag con el objetivo de continuar entrenamientos 
     explotation_mode = False  # Flag para cargar un punto de control previo y explotar el modelo
     train_with_HER = True # Aplicar HER durante el entrenamiento
-    time_to_reward = False # Añadir a la recompensa una 
+    time_to_reward = True # Añadir a la recompensa una 
 
     # Si se carga un punto de control, se inicializan las transiciones en el búfer de repetición
     if explotation_mode or continue_training:
@@ -95,7 +95,7 @@ def main():
                 if cuadratic_negative:
                     applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegativeTimesSquared)
                 else:    
-                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done,  euclidDistanceNegative)
+                    applyHER(agent, observation_HER, action, new_observation_HER, new_goal, done)
             
             new_observation = transformObservation(new_observation)
             agent.remember(observation, action, reward, new_observation, done)  # Almacenar la transición
@@ -144,7 +144,7 @@ def main():
     
     env.close()
 
-    np.savetxt(f"puntuacionesHERDENSETTG0.5.txt", score_history, delimiter= ",")
+    np.savetxt(f"punt{alpha}b{beta}bs{dim_layers}noise{noise}.txt", score_history, delimiter= ",")
     
 if __name__ == "__main__":
     main()

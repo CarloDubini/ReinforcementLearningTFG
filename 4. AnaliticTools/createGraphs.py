@@ -17,9 +17,12 @@ def calcular_medias(datos, ventana=100):
     return medias
 
 # Cargar los nombres de los archivos y los nombres de las series según la carpeta a analizar
-carpeta = "Analisisneuronas"
-normalizar = True
+carpeta = "AnalisisParametros"
+normalizar = False
 eliminarPrimeros = False
+dimensionDatos = 1000
+ventana = 50
+grupos = 3
 
 archivos = os.listdir(carpeta)
 archivos = [os.path.join(carpeta, archivo) for archivo in archivos if archivo.endswith('.txt')]
@@ -28,15 +31,15 @@ nombres_series = [os.path.splitext(os.path.basename(archivo))[0] for archivo in 
 # Inicializar lista para almacenar los datos normalizados
 datos_normalizados = []
 if eliminarPrimeros:
-    eje_x = np.arange(800, 3000, 100)
+    eje_x = np.arange(800, dimensionDatos, ventana)
 else:
-    eje_x = np.arange(0, 3000, 100)
+    eje_x = np.arange(0, dimensionDatos, ventana)
 # Cargar y normalizar los datos de cada archivo
 for archivo in archivos:
-    data = np.loadtxt(archivo, delimiter=',')[0:3000]
+    data = np.loadtxt(archivo, delimiter=',')[0:dimensionDatos]
     if normalizar:
         data = normalize_vector(data)
-    medias = calcular_medias(data)
+    medias = calcular_medias(data, ventana)
     if eliminarPrimeros:
         medias = medias[8:]
     datos_normalizados.append(medias)
@@ -44,10 +47,10 @@ for archivo in archivos:
 
 for i, datos in enumerate(datos_normalizados):
     plt.plot(eje_x, datos, label=nombres_series[i])
-    if i % 3 == 2 or i == len(datos_normalizados)-1:
+    if i % grupos == grupos -1 or i == len(datos_normalizados)-1:
         plt.xlabel('Iteraciones')
         plt.ylabel('Recompensa media')
         #plt.title('Gráfica de Datos Normalizados')
         plt.legend()
-        plt.savefig(f'Gráfica{carpeta}generada{i//3}')
+        plt.savefig(f'Gráfica{carpeta}generada{i//grupos}')
         plt.clf()
