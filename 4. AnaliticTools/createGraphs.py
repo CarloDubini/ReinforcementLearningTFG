@@ -17,8 +17,8 @@ def calcular_medias(datos, ventana=100):
     return medias
 
 # Cargar los nombres de los archivos y los nombres de las series según la carpeta a analizar
-carpeta = "AnalisisParametros\\Noise" 
-normalizar = False
+carpeta = "AnalisisParametros\\Tau" 
+normalizar = True
 eliminarPrimeros = False
 dimensionDatos = 1000
 ventana = 50
@@ -49,7 +49,10 @@ for i, datos in enumerate(datos_normalizados):
     plt.plot(eje_x, datos, label=nombres_series[i])
     if i % grupos == grupos -1 or i == len(datos_normalizados)-1:
         plt.xlabel('Iteraciones')
-        plt.ylabel('Recompensa media')
+        if (normalizar):
+            plt.ylabel('R-score')
+        else:
+            plt.ylabel('Recompensa media')
         #plt.title('Gráfica de Datos Normalizados')
         plt.legend()
         plt.savefig(f'PlotsFinales\\{carpeta}generada{i//grupos}') 
